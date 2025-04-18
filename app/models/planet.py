@@ -1,9 +1,9 @@
 class Planet:
-    def __init__(self, id, name, description, distance_from_sun):
+    def __init__(self, id, name, description, distance_from_sun_mm_km):
         self.id = id
         self.name = name
         self.description = description
-        self.distance_from_sun = distance_from_sun
+        self.distance_from_sun_mm_km = distance_from_sun_mm_km
 
 planets = [
     Planet(1, "Mercury", "The smallest planet in our solar system and closest to the Sun.", 57.9),
