@@ -1,4 +1,4 @@
-from flask import Blueprint, abort, make_response, request
+from flask import Blueprint, abort, make_response, request, Response
 from app.models.planet import Planet
 from ..db import db
 
@@ -41,26 +41,51 @@ def get_planets():
         
     return response_planets
 
-# @planets_bp.get("/<id>")
-# def get_one_planet(id):
-#     planet = validate_planet_id(id)
-#     return dict(
-#         id=planet.id,
-#         name=planet.name,
-#         description=planet.description,
-#         distance_from_sun_mm_km=planet.distance_from_sun_mm_km
-#     )
+@planets_bp.get("/<id>")
+def get_one_planet(id):
+    planet = validate_planet_id(id)
 
-# def validate_planet_id(id):
-#     try:
-#         id = int(id)
-#     except:
-#         response = {"message": f"This ID {id} is invalid"}
-#         abort(make_response(response, 400))
+    return dict(
+        id=planet.id,
+        name=planet.name,
+        description=planet.description,
+        distance_from_sun_mm_km=planet.distance_from_sun_mm_km
+    )
 
-#     for planet in planets:
-#         if planet.id == id:
-#             return planet
+@planets_bp.put("/<id>")
+def update_one_planet(id):
+    planet = validate_planet_id(id)
+    request_body = request.get_json()
     
-#     response = {"message": f"Planet with ID {id} is not found"}
-#     abort(make_response(response, 404))
+    planet.name = request_body["name"]
+    planet.description = request_body["description"]
+    planet.distance_from_sun_mm_km = request_body["distance_from_sun_mm_km"]
+
+    db.session.commit()
+
+    return Response(status=204, mimetype="application/json")
+
+@planets_bp.delete("/<id>")
+def delete_one_planet(id):
+    planet = validate_planet_id(id)
+
+    db.session.delete(planet)
+    db.session.commit()
+
+    return Response(status=204, mimetype="application/json")
+
+def validate_planet_id(id):
+    try:
+        id = int(id)
+    except:
+        response = {"message": f"This ID {id} is invalid"}
+        abort(make_response(response, 400))
+    
+    query = db.select(Planet).where(Planet.id == id)
+    planet = db.session.scalar(query)   
+
+    if not planet:
+        response = {"message": f"Planet with ID {id} is not found"}
+        abort(make_response(response, 404))
+
+    return planet
