@@ -27,7 +27,21 @@ def create_planet():
 
 @planets_bp.get("")
 def get_planets():
-    query = db.select(Planet).order_by(Planet.id)
+    query = db.select(Planet)
+
+    name_param = request.args.get("name")
+    if name_param:
+        query = query.where(Planet.name.ilike(f"%{name_param}%"))
+
+    description_param = request.args.get("description")
+    if description_param:
+        query = query.where(Planet.description.ilike(f"%{description_param}%"))
+    
+    distance_param = request.args.get("distance_from_sun_mm_km")
+    if distance_param:
+        query = query.where(Planet.distance_from_sun_mm_km.ilike(f"%{distance_param}%"))
+
+    query = query.order_by(Planet.id)
     planets = db.session.scalars(query)
 
     response_planets = []
