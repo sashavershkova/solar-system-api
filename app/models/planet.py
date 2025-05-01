@@ -7,6 +7,20 @@ class Planet(db.Model):
     description: Mapped[str]
     distance_from_sun_mm_km: Mapped[float]
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "distance_from_sun_mm_km": self.distance_from_sun_mm_km
+        }
+
+    @classmethod
+    def from_dict(cls, planet_data)
+        planet = cls(name=planet_data["name"], description=planet_data["description"], distance_from_sun_mm_km=planet_data["distance_from_sun_mm_km"])
+
+        return planet
+
 
 # planets = [
 #     Planet(1, "Mercury", "The smallest planet in our solar system and closest to the Sun.", 57.9),
