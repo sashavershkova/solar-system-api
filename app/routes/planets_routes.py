@@ -1,9 +1,32 @@
 from flask import Blueprint, abort, make_response, request, Response
 from app.models.planet import Planet
-from app.routes.routes_utilities import validate_model
+from app.models.moon import Moon
+from app.routes.routes_utilities import validate_model, create_model
 from ..db import db
 
 bp = Blueprint("planets_bp", __name__, url_prefix="/planets")
+
+#Create a nested route for `/planets/<planet_id>/moons` 
+# with the POST method which allows you to add a new moon 
+# to an existing planet resource with id `<planet_id>`.
+@bp.post("/<planet_id>/moons")
+def create_moon_to_planet():
+    planet = validate_model(Planet, planet_id)
+    moon_data = request.get_json()
+    moon_data["planet_id"] = planet.id
+    
+    return make_response(create_model(Moon, moon_data))
+
+# Create a nested route for `/planets/<planet_id>/moons` 
+# with the GET method which returns all moons for the planet 
+# with the id `<planet_id>`
+
+@bp.get("/<planet_id>/moons")
+def get_all_moons_for_planet():
+    planet = validate_model(Planet, planet_id)
+    response = [moon.to_dict() for moon in planet.moons]
+ 
+    return response
 
 
 @bp.post("")
