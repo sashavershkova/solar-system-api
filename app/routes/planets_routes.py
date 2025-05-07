@@ -10,7 +10,7 @@ bp = Blueprint("planets_bp", __name__, url_prefix="/planets")
 # with the POST method which allows you to add a new moon 
 # to an existing planet resource with id `<planet_id>`.
 @bp.post("/<planet_id>/moons")
-def create_moon_to_planet():
+def create_moon_to_planet(planet_id):
     planet = validate_model(Planet, planet_id)
     moon_data = request.get_json()
     moon_data["planet_id"] = planet.id
@@ -22,7 +22,7 @@ def create_moon_to_planet():
 # with the id `<planet_id>`
 
 @bp.get("/<planet_id>/moons")
-def get_all_moons_for_planet():
+def get_all_moons_for_planet(planet_id):
     planet = validate_model(Planet, planet_id)
     response = [moon.to_dict() for moon in planet.moons]
  
